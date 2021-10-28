@@ -16,69 +16,69 @@ func newLuaStack(size int) *luaStack {
 }
 
 // check 检查栈的空闲空间是否还可以推入n个值，如果不能就扩容
-func (self *luaStack) check(n int) {
-	free := len(self.slots) - self.top
+func (lStack *luaStack) check(n int) {
+	free := len(lStack.slots) - lStack.top
 	for i := free; i < n; i++ {
-		self.slots = append(self.slots, nil)
+		lStack.slots = append(lStack.slots, nil)
 	}
 }
 
 // push 入栈
-func (self *luaStack) push(val luaValue) {
-	if self.top == len(self.slots) {
+func (lStack *luaStack) push(val luaValue) {
+	if lStack.top == len(lStack.slots) {
 		panic("stack overflow!")
 	}
-	self.slots[self.top] = val
-	self.top++
+	lStack.slots[lStack.top] = val
+	lStack.top++
 }
 
 // pop 弹出栈
-func (self *luaStack) pop() luaValue {
-	if self.top < 1 {
+func (lStack *luaStack) pop() luaValue {
+	if lStack.top < 1 {
 		panic("stack underflow!")
 	}
-	self.top--
-	val := self.slots[self.top]
-	self.slots[self.top] = nil
+	lStack.top--
+	val := lStack.slots[lStack.top]
+	lStack.slots[lStack.top] = nil
 	return val
 }
 
 // absIndex 将相对索引转换成绝对索引
-func (self *luaStack) absIndex(idx int) int {
+func (lStack *luaStack) absIndex(idx int) int {
 	if idx >= 0 {
 		return idx
 	}
-	return idx + self.top + 1
+	return idx + lStack.top + 1
 }
 
 // isValid 检查索引是否有效
-func (self *luaStack) isValid(idx int) bool {
-	absIdx := self.absIndex(idx)
-	return absIdx > 0 && absIdx <= self.top
+func (lStack *luaStack) isValid(idx int) bool {
+	absIdx := lStack.absIndex(idx)
+	return absIdx > 0 && absIdx <= lStack.top
 }
 
 // get 根据索引从栈取值，如果无效就返回nil
-func (self *luaStack) get(idx int) luaValue {
-	absIdx := self.absIndex(idx)
-	if absIdx > 0 && absIdx <= self.top {
-		return self.slots[absIdx-1]
+func (lStack *luaStack) get(idx int) luaValue {
+	absIdx := lStack.absIndex(idx)
+	if absIdx > 0 && absIdx <= lStack.top {
+		return lStack.slots[absIdx-1]
 	}
 	return nil
 }
 
 // set 往栈写入值，索引无效会panic
-func (self *luaStack) set(idx int, val luaValue) {
-	absIdx := self.absIndex(idx)
-	if absIdx > 0 && absIdx <= self.top {
-		self.slots[absIdx-1] = val
+func (lStack *luaStack) set(idx int, val luaValue) {
+	absIdx := lStack.absIndex(idx)
+	if absIdx > 0 && absIdx <= lStack.top {
+		lStack.slots[absIdx-1] = val
 		return
 	}
 	panic("invalid index!")
 }
 
 // reverse 反转
-func (self *luaStack) reverse(from, to int) {
-	slots := self.slots
+func (lStack *luaStack) reverse(from, to int) {
+	slots := lStack.slots
 	for from < to {
 		slots[from], slots[to] = slots[to], slots[from]
 		from++
