@@ -102,14 +102,7 @@ func (lState *luaState) ToNumber(idx int) float64 {
 // ToNumberX 取出索引上的数字，如果不是数字则尝试转换，转换成功会返回转换结果和true，转换失败会返回0和false
 func (lState *luaState) ToNumberX(idx int) (float64, bool) {
 	val := lState.stack.get(idx)
-	switch x := val.(type) {
-	case float64:
-		return x, true
-	case int64:
-		return float64(x), true
-	default:
-		return 0, false
-	}
+	return convertToFloat(val)
 }
 
 // ToInteger 取出索引处值并转换为int64
@@ -121,8 +114,7 @@ func (lState *luaState) ToInteger(idx int) int64 {
 // ToIntegerX 取出索引处值，并转换成int64，会返回象征转换失败与否的bool
 func (lState *luaState) ToIntegerX(idx int) (int64, bool) {
 	val := lState.stack.get(idx)
-	i, ok := val.(int64)
-	return i, ok
+	return convertToInteger(val)
 }
 
 // ToString 获取指定索引上的string，如果不是string会试图转换成string，会修改栈上内容

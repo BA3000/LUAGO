@@ -1,5 +1,6 @@
 package api
 
+// 基本数据类型
 const (
 	LUA_TNONE = iota - 1 // -1
 	LUA_TNIL
@@ -11,4 +12,29 @@ const (
 	LUA_TFUNCTION
 	LUA_TUSERDATA
 	LUA_TTHREAD
+)
+
+// 算术和按位运算符对应的运算码
+const (
+	LUA_OPADD = iota	// +
+	LUA_OPSUB			// -
+	LUA_OPMUL			// *
+	LUA_OPMOD			// %
+	LUA_OPPOW			// ^
+	LUA_OPDIV			// /
+	LUA_OPIDIV			// //
+	LUA_OPBAND			// &
+	LUA_OPBOR			// |
+	LUA_OPBXOR			// ~
+	LUA_OPSHL			// <<
+	LUA_OPSHR			// >>
+	LUA_OPUNM			// - (unary minus)
+	LUA_OPBNOT			// ~
+)
+
+// 比较运算码
+const (
+	LUA_OPEQ = iota	// ==
+	LUA_OPLT		// <
+	LUA_OPLE		// <=
 )
