@@ -4,22 +4,43 @@ import (
 	"fmt"
 	. "luago/api"
 	"luago/state"
+	"io/ioutil"
+	"os"
+	"luago/binchunk"
+	. "luago/vm"
 )
 
 func main() {
-	ls := state.New()
-	ls.PushInteger(1)
-	ls.PushString("2.0")
-	ls.PushString("3.0")
-	ls.PushNumber(4.0)
-	printStack(ls)
+	if len(os.Args) > 1 {
+		data, err := ioutil.ReadFile(os.Args[1])
+		if err != nil {panic(err)}
+		proto := binchunk.Undump(data)
+		luaMain(proto)
+	}
+}
 
-	ls.Arith(LUA_OPADD);	printStack(ls)
-	ls.Arith(LUA_OPBNOT);	printStack(ls)
-	ls.Len(2);			printStack(ls)
-	ls.Concat(3);		printStack(ls)
-	ls.PushBoolean(ls.Compare(1, 2, LUA_OPEQ))
-	printStack(ls)
+func luaMain(proto *binchunk.Prototype) {
+	// 获取运行输入函数需要用到的寄存器数量
+	nRegs := int(proto.MaxStackSize)
+	// 栈空间要分配多一点，因为指令实现函数也需要空间
+	ls := state.New(nRegs + 8, proto)
+	// 在栈里预留出寄存器空间，剩下的流量给指令实现函数
+	ls.SetTop(nRegs)
+	for {
+		pc := ls.PC()
+		// 取出指令
+		inst := Instruction(ls.Fetch())
+		if inst.Opcode() != OP_RETURN {
+			// 执行指令
+			inst.Execute(ls)
+			// 打印指令和栈信息
+			fmt.Printf("[%02d] %s", pc + 1, inst.OpName())
+			printStack(ls)
+		} else {
+			// 遇到return，返回
+			break
+		}
+	}
 }
 
 func printStack(ls LuaState)  {

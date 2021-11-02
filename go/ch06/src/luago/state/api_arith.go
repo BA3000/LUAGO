@@ -4,6 +4,10 @@ import "math"
 import . "luago/api"
 import "luago/number"
 
+type operator struct {
+	integerFunc	func(int64, int64) int64
+	floatFunc	func(float64, float64) float64
+}
 // 基本运算符
 var (
 	iadd  = func(a, b int64) int64 { return a + b }
@@ -27,11 +31,6 @@ var (
 	funm  = func(a, _ float64) float64 { return -a }
 	bnot  = func(a, _ int64) int64 { return ^a }
 )
-
-type operator struct {
-	integerFunc	func(int64, int64) int64
-	floatFunc	func(float64, float64) float64
-}
 
 var operators = []operator{
 	{iadd, fadd},
