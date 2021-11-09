@@ -5,6 +5,10 @@ type luaStack struct {
 	slots	[]luaValue
 	// 栈顶索引
 	top		int
+	prev	*luaStack
+	closure	*closure
+	varargs	[]luaValue
+	pc		int
 }
 
 // newLuaStack 创建指定容量的栈
