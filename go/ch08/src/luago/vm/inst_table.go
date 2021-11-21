@@ -46,6 +46,13 @@ func setList(i Instruction, vm LuaVM) {
 		c = Instruction(vm.Fetch()).Ax()
 	}
 
+	bIsZero := b == 0
+	if bIsZero {
+		// b 为0的时候，SETLIST就可以使用CALL指令留在栈顶的所有返回值
+		b = int(vm.ToInteger(-1)) - a - 1
+		vm.Pop(1)
+	}
+
 	idx := int64(c * LFIELDS_PER_FLUSH)
 	for j := 1; j <= b; j++ {
 		idx++
@@ -53,5 +60,18 @@ func setList(i Instruction, vm LuaVM) {
 		vm.PushValue(a + j)
 		// 将栈顶的数据设置到表的指定索引处
 		vm.SetI(a, idx)
+	}
+
+	if bIsZero {
+		for j := vm.RegisterCount() + 1; j <= vm.GetTop(); j++ {
+			idx++
+			// 将索引 j 指向的值推入栈
+			vm.PushValue(j)
+			// 将栈顶索引 j 指定的值设置到 idx 键值上，接着列表写
+			vm.SetI(a, idx)
+		}
+
+		// clear stack
+		vm.SetTop(vm.RegisterCount())
 	}
 }

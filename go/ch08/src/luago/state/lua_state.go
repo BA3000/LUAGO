@@ -1,19 +1,25 @@
 package state
 
-import "luago/binchunk"
-
 type luaState struct {
 	stack	*luaStack
-	proto	*binchunk.Prototype
-	// 程序计数器
-	pc		int
 }
 
 // New 创建luaState实例
-func New(stackSize int, proto *binchunk.Prototype) *luaState {
+func New() *luaState {
 	return &luaState{
-		stack:	newLuaStack(stackSize),
-		proto:	proto,
-		pc:		0,
+		stack:	newLuaStack(20),
 	}
+}
+
+// pushLuaStack 相当于单向链表的 push
+func (lState *luaState) pushLuaStack(stack *luaStack) {
+	stack.prev = lState.stack
+	lState.stack = stack
+}
+
+// popLuaStack 相当于单向链表的 pop
+func (lState *luaState) popLuaStack() {
+	stack := lState.stack
+	lState.stack = stack.prev
+	stack.prev = nil
 }
